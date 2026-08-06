@@ -1,0 +1,15 @@
+1. Instalación de librerías y navegador 
+(Ejecutar una sola vez en la terminal de VSC)
+Bash
+
+pip install pandas openpyxl playwright
+playwright install chromium
+
+2. Comando para iniciar el scraping
+Bash
+
+python scraper_maps.py
+
+Recordatorio: Recuerda tener cerrado el archivo Base_PyMEs_POS.xlsx 
+en Microsoft Excel antes de ejecutar el comando para evitar errores 
+de permisos al guardar los datos.
