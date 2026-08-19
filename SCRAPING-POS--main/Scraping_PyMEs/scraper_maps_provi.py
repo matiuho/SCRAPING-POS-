@@ -4,10 +4,15 @@ import pandas as pd
 from playwright.sync_api import sync_playwright
 
 CADENAS_Y_MALLS = [
+    # Malls, retail y supermercados
     "falabella", "paris", "ripley", "sodimac", "easy", "lider", "walmart", 
     "santa isabel", "unimarc", "alvi", "jumbo", "express", "tottus", "oxxo", 
     "ok market", "mall", "plaza", "costanera", "outlet", "copec", "shell", 
-    "penta", "spid", "cruz verde", "ahumada", "salcobrand"
+    "penta", "spid", "cruz verde", "ahumada", "salcobrand",
+    # Cadenas ferreteras, automotrices y salud
+    "imperial", "construmart", "chilemat", "mts", "autoplanet", "redsalud", 
+    "integramedica", "clinica alemana", "clinica las condes", "clinica indisa", 
+    "bupa", "uno salud"
 ]
 
 def es_cadena_grande(nombre):
@@ -137,7 +142,19 @@ def extraer_pymes_google_maps(busqueda, comuna, max_resultados=10):
     return resultados
 
 if __name__ == "__main__":
-    rubros = ["Minimarket", "Almacen", "Botilleria", "Cafeteria"]
+    # Nuevos rubros enfocados en ticket promedio > $20.000
+    rubros = [
+        "Ferreteria",
+        "Materiales de construccion",
+        "Taller mecanico",
+        "Veterinaria",
+        "Boutique de ropa",
+        "Peluqueria",
+        "Barberia",
+        "Centro de estetica",
+        "Distribuidora",
+        "Clinica dental"
+    ]
     comuna = "Providencia"
 
     todas_las_pymes = []
