@@ -9,6 +9,7 @@ playwright install chromium
 Bash
 
 python scraper_maps.py
+python scraper_maps_provi.py
 
 Recordatorio: Recuerda tener cerrado el archivo Base_PyMEs_POS.xlsx 
 en Microsoft Excel antes de ejecutar el comando para evitar errores 
