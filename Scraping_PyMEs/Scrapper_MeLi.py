@@ -7,7 +7,6 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
 from openpyxl.utils import get_column_letter
 
-# Cadenas y retail a excluir
 CADENAS_EXCLUIDAS = [
     "falabella", "paris", "ripley", "sodimac", "easy", "lider", "walmart",
     "santa isabel", "unimarc", "alvi", "jumbo", "express", "tottus", "oxxo",
@@ -42,11 +41,11 @@ def normalizar_telefono_chile(telefono_str):
     if digitos.startswith('56'):
         digitos = digitos[2:]
 
-    # Descartar red fija (2) o números comerciales/gratuitos (800 / 600)
+    # Descartar red fija (inicia con 2) o números 800/600
     if digitos.startswith('2') or digitos.startswith('800') or digitos.startswith('600'):
         return None
 
-    # Validar formato celular chileno (9 dígitos comenzando con 9)
+    # Validar celular chileno (9 dígitos comenzando con 9)
     if len(digitos) == 9 and digitos.startswith('9'):
         return f"+56 {digitos[0]} {digitos[1:5]} {digitos[5:]}"
 
@@ -56,10 +55,6 @@ def es_cadena_grande(nombre):
     nombre_lower = str(nombre).lower()
     return any(cadena in nombre_lower for cadena in CADENAS_EXCLUIDAS)
 
-
-# =====================================================================
-# MODULO: EXTRACCIÓN DE LOCALES FÍSICOS EN SANTIAGO
-# =====================================================================
 def extraer_locales_santiago(rubro, max_resultados, telefonos_existentes, nombres_existentes):
     comuna = "Santiago"
     print(f"\n🚀 Buscando: '{rubro}' en '{comuna}'...")
@@ -74,7 +69,6 @@ def extraer_locales_santiago(rubro, max_resultados, telefonos_existentes, nombre
         page.goto(query_url)
         page.wait_for_timeout(4000)
 
-        # Scroll para desplegar locales físicos
         for _ in range(6):
             try:
                 feed = page.locator('div[role="feed"]')
@@ -130,7 +124,7 @@ def extraer_locales_santiago(rubro, max_resultados, telefonos_existentes, nombre
                 if not telefono_validado or telefono_validado in telefonos_existentes:
                     continue
 
-                # Extraer Dirección Física
+                # Extraer Dirección
                 direccion = "Sin Dirección"
                 dir_locator = page.locator('button[data-item-id="address"], button[aria-label*="Dirección"]')
                 if dir_locator.count() > 0:
@@ -160,10 +154,6 @@ def extraer_locales_santiago(rubro, max_resultados, telefonos_existentes, nombre
 
     return nuevos_locales
 
-
-# =====================================================================
-# GUARDADO INCREMENTAL EN Base_MeLi.xlsx
-# =====================================================================
 def guardar_base_consolidada(nuevos_registros, archivo_salida="Base_MeLi.xlsx"):
     df_previo = pd.DataFrame(columns=COLUMNAS_EXCEL)
 
@@ -174,15 +164,12 @@ def guardar_base_consolidada(nuevos_registros, archivo_salida="Base_MeLi.xlsx"):
                 if col not in df_cargado.columns:
                     df_cargado[col] = ""
             df_previo = df_cargado[COLUMNAS_EXCEL].copy()
-            # Conservar último registrado en caso de duplicados previos
             df_previo.drop_duplicates(subset=["Telefono_WSP"], keep="last", inplace=True)
         except Exception as e:
             print(f"⚠️ Error al leer base previa: {e}")
 
     df_nuevos = pd.DataFrame(nuevos_registros)
     df_final = pd.concat([df_previo, df_nuevos], ignore_index=True)
-    
-    # REGLA: Conservar solo el último registro ante números repetidos
     df_final.drop_duplicates(subset=["Telefono_WSP"], keep="last", inplace=True)
 
     wb = openpyxl.Workbook()
@@ -233,12 +220,7 @@ def guardar_base_consolidada(nuevos_registros, archivo_salida="Base_MeLi.xlsx"):
     wb.save(archivo_salida)
     print(f"\n🎉 ¡Guardado exitoso en '{archivo_salida}'! Total comercios activos en Santiago: {len(df_final)}")
 
-
-# =====================================================================
-# EJECUCIÓN PRINCIPAL: SANTIAGO
-# =====================================================================
 if __name__ == "__main__":
-    # Rubros comerciales presenciales de ticket alto en Santiago
     rubros = [
         "Taller mecanico",
         "Ferreteria",
